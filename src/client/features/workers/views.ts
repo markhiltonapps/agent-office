@@ -194,7 +194,11 @@ export function installWorkerViews(ctx: Ctx, core: CoreState, parts: WorkerViews
     arrangeSeats();
     // Whoever's waiting on someone lines up for the throne, the one who's waited longest first.
     court?.line(waitingInOrder(store.workers.values()).filter(inCourt).map((w) => w.id));
-    renderWorkers((id) => parts.waiting.openWorkerTerminal(id));
+    renderWorkers((id) => parts.waiting.openWorkerTerminal(id), (id, current) => {
+      const name = store.workers.get(id)?.name ?? 'this worker';
+      const role = window.prompt(`What is ${name} for? (a few words, like "Director"; leave empty to clear)`, current);
+      if (role !== null) net.send({ t: 'worker.role', workerId: id, role });
+    });
     parts.waiting.renderWaiting();
     parts.notifier.sync(store.workers);
     renderTitle();

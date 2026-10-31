@@ -56,6 +56,10 @@
 .people .sub { display: block; font-size: 11px; font-weight: 600; color: var(--muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .people .speaking { color: var(--good); }
 .workers .name { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.workers .role { display: block; width: fit-content; max-width: 100%; margin: 1px 0 2px; padding: 0 7px; border-radius: 999px; background: var(--ink); color: #fff; font-size: 11px; font-weight: 800; overflow: hidden; text-overflow: ellipsis; }
+.workers .role-edit { flex: none; border: 0; background: none; padding: 2px 5px; border-radius: 6px; font-size: 13px; color: var(--muted); cursor: pointer; opacity: .55; }
+.workers li:hover .role-edit, .workers .role-edit:focus-visible { opacity: 1; }
+.workers .role-edit:hover { background: var(--paper-2); color: var(--ink); }
 .workers .sub { display: block; font-size: 11px; font-weight: 600; color: var(--muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .workers h3 .cost { margin-left: auto; font-size: 12px; text-transform: none; letter-spacing: 0; }
 .workers .cost { font-size: 11px; font-weight: 800; color: var(--muted); white-space: nowrap; font-variant-numeric: tabular-nums; }

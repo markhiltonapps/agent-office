@@ -1,6 +1,6 @@
 // workers.json: every worker as the office last saw it, to pick them all back up after a restart.
 import { existsSync, readFileSync, writeFileSync } from 'node:fs';
-import type { AgentProvider, WorkerInfo, WorkerStatus, WorkerTask } from '../../shared/protocol.js';
+import { WORKER_ROLE_MAX, type AgentProvider, type WorkerInfo, type WorkerStatus, type WorkerTask } from '../../shared/protocol.js';
 import { DESK_BY_ID } from '../../shared/layout.js';
 import { isAgentProvider, savedEffort, savedModel } from '../../shared/providers.js';
 import { providerAdapter } from '../providers/index.js';
@@ -26,6 +26,7 @@ export function saveWorkers(file: string, workers: Iterable<Worker>, stopping: b
     effort: info.effort,
     deskId: info.deskId,
     name: info.name,
+    role: info.role,
     color: info.color,
     createdBy: info.createdBy,
     createdAt: info.createdAt,
@@ -80,6 +81,7 @@ export function restoreWorkers(file: string, workers: Map<string, Worker>, defau
         effort: savedEffort(provider, s.effort),
         deskId: s.deskId,
         name: s.name ?? 'Worker',
+        role: typeof s.role === 'string' ? s.role.trim().slice(0, WORKER_ROLE_MAX) || undefined : undefined,
         color: s.color ?? COLORS[0],
         status: 'offline',
         acked: true,

@@ -8,7 +8,7 @@ import { $, h, STATUS_LABEL, timeAgo } from './dom';
 import { usageLabel, usageTitle } from './usage';
 import { providerLabel, providerUsageState, providerWaitingLabel, resolvedProvider, modelBadge } from './provider';
 
-export function renderWorkers(onOpen: (id: string) => void) {
+export function renderWorkers(onOpen: (id: string) => void, onRole?: (id: string, current: string) => void) {
   const ul = $('workers');
   ul.replaceChildren();
   const workers = needyFirst(store.workers.values());
@@ -28,8 +28,14 @@ export function renderWorkers(onOpen: (id: string) => void) {
         'li',
         { class: asking ? 'needs-you-row' : '', onclick: () => onOpen(w.id), title: asking ? `${w.name} needs you: open its terminal to answer` : `Open ${w.name}'s terminal` },
         h('span.dot', { style: `background:${w.color}` }),
-        h('span.name', {}, w.name, sub ? h('span.sub', {}, sub) : null,
+        h('span.name', {}, w.name, w.role ? h('span.role', { title: `${w.name}'s role` }, w.role) : null, sub ? h('span.sub', {}, sub) : null,
           usageState === 'tracked' && w.usage ? h('span.cost', { title: usageTitle(w.usage, providerKind) }, usageLabel(w.usage, providerKind)) : null),
+        onRole
+          ? h('button.role-edit', { type: 'button', 'aria-label': `Set ${w.name}'s role`, title: w.role ? `Change ${w.name}'s role` : `Say what ${w.name} is for`, onclick: (e: Event) => {
+              e.stopPropagation();
+              onRole(w.id, w.role ?? '');
+            } }, '✎')
+          : null,
         w.lost ? h('span.pill.lost', { title: 'Its worktree was deleted outside agent-office: open it to fix it' }, 'worktree deleted') : h('span.pill', { class: w.status }, asking ? 'NEEDS YOU' : (STATUS_LABEL[w.status] ?? w.status)),
         ask,
       ),

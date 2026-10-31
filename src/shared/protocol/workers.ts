@@ -14,6 +14,9 @@ export type WorkerStatus =
 
 export type WorkerKind = 'agent' | 'shell';
 
+/** The most characters a worker's role (WorkerInfo.role) can have. */
+export const WORKER_ROLE_MAX = 32;
+
 /**
  * What a working agent's latest tool call looks like from across the room (see shared/actions.ts):
  * reading files, editing them, running tests or a build, on the web, or tests failing again and again.
@@ -37,6 +40,8 @@ export interface WorkerInfo {
   effort?: AgentEffort;
   deskId: string;
   name: string;
+  /** What it's for, in a few words ("Director"), set by anyone in the office and shown beside its name (see WORKER_ROLE_MAX). */
+  role?: string;
   color: string;
   status: WorkerStatus;
   /** True once someone opened the terminal after the last done / needs_input. */
@@ -184,6 +189,8 @@ export type WorkerClientMsg =
   | { t: 'worker.worktree'; workerId: string }
   /** Puts a lost worker's worktree back and starts it again (see WorkerInfo.lost); `all`: every lost worker on the floor. */
   | { t: 'worker.rebuild'; workerId: string; all?: boolean }
+  /** Says what the worker is for (see WorkerInfo.role); an empty `role` clears it. */
+  | { t: 'worker.role'; workerId: string; role: string }
   | { t: 'worker.attach'; workerId: string }
   | { t: 'worker.detach'; workerId: string }
   /** With `issue`, the prompt hands the worker that GitHub issue, which is taken as for worker.spawn. */

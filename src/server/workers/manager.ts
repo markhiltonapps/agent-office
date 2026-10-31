@@ -1,6 +1,6 @@
 import { randomBytes } from 'node:crypto';
 import path from 'node:path';
-import type { AgentChoice, AgentEffort, AgentProvider, TerminalHit, WorkerInfo, WorkerKind, WorkerRepo, WorkerStatus } from '../../shared/protocol.js';
+import { WORKER_ROLE_MAX, type AgentChoice, type AgentEffort, type AgentProvider, type TerminalHit, type WorkerInfo, type WorkerKind, type WorkerRepo, type WorkerStatus } from '../../shared/protocol.js';
 import { AGENT_PROVIDERS, takesEffort, takesModel } from '../../shared/providers.js';
 import { Worktrees, workspaceOf, type WorktreeCleanup, type WorktreeState } from '../worktrees.js';
 import { DESK_BY_ID, STATION_AGENT, deskBuilt } from '../../shared/layout.js';
@@ -772,6 +772,17 @@ export class WorkerManager {
       progress: providerAdapter(w.info.provider)?.screen?.progress ? (busy) => this.onProgress(w, busy) : undefined,
       title: (title) => this.setTitle(w, title),
     });
+  }
+
+  /** Says what a worker is for ("Director"), shown beside its name; empty clears it. */
+  setRole(id: string, role: string) {
+    const w = this.workers.get(id);
+    if (!w) return;
+    const clean = role.replace(/\s+/g, ' ').trim().slice(0, WORKER_ROLE_MAX) || undefined;
+    if (clean === w.info.role) return;
+    w.info.role = clean;
+    this.emitUpdate(w);
+    this.persist();
   }
 
   private setTitle(w: Worker, title: string) {

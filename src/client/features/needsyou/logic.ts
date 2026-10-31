@@ -40,7 +40,7 @@ export function bannerText(asking: readonly WorkerInfo[], now: number): BannerTe
   const ask = alertDetail(w)?.replace(/\s+/g, ' ').trim();
   const detail = [ask && (ask.length > 90 ? `${ask.slice(0, 89)}…` : ask), waited(w.waitingSince, now)].filter(Boolean).join(' · ');
   const more = asking.length > 1 ? `+${asking.length - 1} more` : '';
-  const title = `${w.name} needs you`;
+  const title = `${w.name}${w.role ? ` (${w.role})` : ''} needs you`;
   return { id: w.id, title, detail, more, key: `${w.id}|${title}|${detail}|${more}` };
 }
 

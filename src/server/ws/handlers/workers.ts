@@ -2,7 +2,7 @@
 // worktrees and pull requests.
 import { MAX_REPOS, type RepoSource } from '../../workers.js';
 import { OPEN_CODE_MODEL_MAX } from '../../../shared/providers.js';
-import { isAgentEffort, isAgentProvider, type WorkerClientMsg } from '../../../shared/protocol.js';
+import { isAgentEffort, isAgentProvider, WORKER_ROLE_MAX, type WorkerClientMsg } from '../../../shared/protocol.js';
 import { issueNumber, num, str } from '../../office/input.js';
 import { here, workerOf } from './common.js';
 import type { FeatureHooks, HandlerMap, ViewPieces } from './types.js';
@@ -97,6 +97,10 @@ export const workerHandlers = {
       const whose = names.length === 1 ? `${names[0]}'s worktree` : `the worktrees of ${names.slice(0, -1).join(', ')} and ${names[names.length - 1]}`;
       ctx.toastFloor(floor, `🌿 ${who} rebuilt ${whose}${notes.length ? ` — ${notes.join('; ')}` : ''}`);
     })();
+  },
+  'worker.role'(ctx, c, msg) {
+    const w = workerOf(ctx, msg.workerId);
+    if (w) w.floor.workers.setRole(w.wid, str(msg.role, WORKER_ROLE_MAX * 4));
   },
   'worker.attach'(ctx, c, msg) {
     const who = c.peer.name;

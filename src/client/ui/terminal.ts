@@ -108,7 +108,8 @@ export function openTerminal(net: Net, workerId: string, onChanges?: () => void,
   if (!info) return;
 
   const dot = h('span.dot', { style: `background:${info.color}` });
-  const title = h('h2', {}, info.kind === 'agent' ? `${engineLabel(info, store.project)} · ${info.name}` : info.name);
+  const who = info.role ? `${info.name} (${info.role})` : info.name;
+  const title = h('h2', {}, info.kind === 'agent' ? `${engineLabel(info, store.project)} · ${who}` : who);
   const pill = h('span.pill', {}, '');
   const cost = h('span.cost', {});
   const viewers = h('div.viewers', {});
