@@ -28,7 +28,7 @@ import { airlock, cellDoor, thud } from '../features/workers/sound';
 import { golf, type GolfSound } from '../features/golf/sound';
 import { gong } from '../features/gong/sound';
 import { Jukebox, type JukeboxPlay } from '../features/jukebox/sound';
-import { needsYou } from '../features/needsyou/sound';
+import { knock, needsYou } from '../features/needsyou/sound';
 import type { Pos } from './places';
 import { Footsteps, pageTurn, paper } from './steps';
 import { toss, type TossSound } from '../features/bargames/sound';
@@ -271,6 +271,11 @@ export class OfficeSound {
   /** The alarm for a worker that needs you, or (`again`) the soft reminder while it still does. */
   needsYou(again = false) {
     needsYou(this.a, again);
+  }
+
+  /** Three taps on the glass: the other way to say a worker needs you (see features/needsyou/ui.ts for the fist). */
+  knock() {
+    knock(this.a);
   }
 
   // ---- The rooftop bar (features/bar) -------------------------------------------------------------

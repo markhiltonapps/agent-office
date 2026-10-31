@@ -42,7 +42,7 @@ export type HudPanel = 'workers' | 'people' | 'spend' | 'limits' | 'chat' | 'flo
 export const HUD_DEFAULTS: Record<HudPanel, boolean> = { workers: false, people: false, spend: false, limits: false, chat: true, floor: false };
 
 /** How the office rings when a worker needs you: not at all, once, or again and again until someone's at its terminal. */
-export const NEEDS_YOU_SOUNDS = ['off', 'once', 'remind'] as const;
+export const NEEDS_YOU_SOUNDS = ['off', 'once', 'remind', 'knock'] as const;
 export type NeedsYouSound = (typeof NEEDS_YOU_SOUNDS)[number];
 
 export interface Settings {

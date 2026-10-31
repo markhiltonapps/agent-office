@@ -56,6 +56,14 @@ export class Banner {
     this.edge.classList.add('on');
   }
 
+  /** A fist taps three times on the glass, in time with the sound (see knock in sound.ts), and goes. */
+  knock() {
+    this.hud.querySelector('.knock')?.remove();
+    const el = h('div.knock', { 'aria-hidden': 'true' }, h('span.knock-ring'), h('span.knock-ring'), h('span.knock-ring'), h('span.knock-fist', {}, '👊'));
+    this.hud.append(el);
+    window.setTimeout(() => el.remove(), 1500);
+  }
+
   /** Under the top bar, and under the dock too where it has wrapped down into the banner's way. */
   private place() {
     if (!this.shown) return;

@@ -43,12 +43,22 @@ export function installNeedsYou(ctx: Ctx, parts: Pick<Parts, 'views' | 'waiting'
     banner.show(bannerText(asking.filter((w) => !hidden.has(waitKey(w))), Date.now()));
   }
 
+  /** The alarm, or the knock on the glass if that's what you've chosen; `again` is the reminder while it's still waiting. */
+  function alert(again: boolean) {
+    if (settings.needsYouSound === 'knock') {
+      sound.knock();
+      banner.knock();
+    } else sound.needsYou(again);
+  }
+  // The settings window plays the knock's picture when you pick it.
+  window.addEventListener('office:knock-preview', () => banner.knock());
+
   function sync() {
     // Not ones that were asking already when the page first saw them (a reload, a floor you've just arrived on).
     if (fresh.take(store.workers).length) {
       banner.flash();
       if (settings.needsYouSound !== 'off') {
-        sound.needsYou();
+        alert(false);
         reminders.rang(performance.now());
       }
     }
@@ -75,7 +85,7 @@ export function installNeedsYou(ctx: Ctx, parts: Pick<Parts, 'views' | 'waiting'
   setInterval(() => {
     const asking = needingYou(store.workers.values());
     if (asking.length) paintBanner();
-    if (reminders.due(asking, performance.now()) && settings.needsYouSound === 'remind') sound.needsYou(true);
+    if (reminders.due(asking, performance.now()) && (settings.needsYouSound === 'remind' || settings.needsYouSound === 'knock')) alert(true);
   }, 1000);
 
   const at = new THREE.Vector3();

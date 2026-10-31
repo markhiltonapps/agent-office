@@ -19,6 +19,17 @@
 .needs-you-flash { position: fixed; inset: 0; z-index: 60; opacity: 0; pointer-events: none !important; box-shadow: inset 0 0 0 8px var(--bad), inset 0 0 150px 36px rgba(239, 71, 111, .8); }
 .needs-you-flash.on { animation: needs-you-flash 2.4s ease-out; }
 
+/* The knock (the "Knock on my screen" choice): a fist taps three times on the glass, a ring spreading out where each one lands. */
+.knock { position: fixed; left: 50%; top: 42%; width: 0; height: 0; z-index: 61; pointer-events: none !important; }
+.knock-fist { position: absolute; left: -34px; top: -34px; font-size: 68px; line-height: 1; opacity: 0; filter: drop-shadow(0 4px 0 rgba(43, 45, 66, .35)); animation: knock-fist .22s ease-in 3 both; }
+.knock-ring { position: absolute; left: -55px; top: -55px; width: 110px; height: 110px; box-sizing: border-box; border-radius: 50%; border: 4px solid rgba(255, 255, 255, .95); box-shadow: 0 0 0 2px rgba(43, 45, 66, .3), inset 0 0 18px rgba(255, 255, 255, .6); opacity: 0; animation: knock-ring .5s ease-out both; }
+.knock-ring:nth-child(1) { animation-delay: .13s; }
+.knock-ring:nth-child(2) { animation-delay: .35s; }
+.knock-ring:nth-child(3) { animation-delay: .57s; }
+@keyframes knock-fist { 0% { transform: scale(1.9); opacity: 0; } 40% { opacity: 1; } 60% { transform: scale(1); opacity: 1; } 80% { transform: scale(.9); opacity: 1; } 100% { transform: scale(1.2); opacity: 1; } }
+@keyframes knock-ring { 0% { transform: scale(.4); opacity: .95; } 100% { transform: scale(1.7); opacity: 0; } }
+@keyframes knock-fade { 0% { opacity: .9; } 100% { opacity: 0; } }
+
 /* The top bar's count of who's waiting, while one of them needs you, and the same in the Workers panel. */
 .dock-btn[data-action=waiting].danger { --rest: 0 3px 0 var(--ink); animation: needs-you-ring 1.6s ease-out infinite; }
 #waiting.needs-you-now { --rest: 0 0 0 0 transparent; animation: needs-you-ring 1.6s ease-out infinite; }
@@ -31,5 +42,7 @@
 @media (prefers-reduced-motion: reduce) {
   .needs-you, .needs-you-icon, .dock-btn[data-action=waiting].danger, #waiting.needs-you-now { animation: none; }
   .needs-you-flash.on { animation: needs-you-fade 1.6s ease-out; }
+  .knock-fist { animation: none; opacity: 0; }
+  .knock-ring { animation: knock-fade .6s ease-out both; }
 }
 @keyframes needs-you-fade { from { opacity: 1; } to { opacity: 0; } }
