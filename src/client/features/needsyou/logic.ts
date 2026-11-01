@@ -50,15 +50,24 @@ export class Fresh {
 
   /** The workers that started needing you since the last look. */
   take(workers: ReadonlyMap<string, WorkerInfo>): WorkerInfo[] {
-    const out: WorkerInfo[] = [];
+    return this.changes(workers).asking;
+  }
+
+  /** Who started asking, and who finished what they were on, since the last look. */
+  changes(workers: ReadonlyMap<string, WorkerInfo>): { asking: WorkerInfo[]; finished: WorkerInfo[] } {
+    const asking: WorkerInfo[] = [];
+    const finished: WorkerInfo[] = [];
     for (const w of workers.values()) {
       const before = this.last.get(w.id);
       this.last.set(w.id, w.status);
-      if (before !== undefined && before !== w.status && w.status === 'needs_input') out.push(w);
+      if (before === undefined || before === w.status) continue;
+      if (w.status === 'needs_input') asking.push(w);
+      // Only one that was at it: not one that's just woken up, or come back from a restart.
+      else if (w.status === 'done' && (before === 'working' || before === 'needs_input')) finished.push(w);
     }
     // Gone, or on a floor you've left: new to the page if it comes back.
     for (const id of this.last.keys()) if (!workers.has(id)) this.last.delete(id);
-    return out;
+    return { asking, finished };
   }
 }
 

@@ -368,6 +368,28 @@ export function openTerminal(net: Net, workerId: string, onChanges?: () => void,
   });
 
   term.open(host);
+
+  // On a touch screen there's no wheel: a finger dragging the terminal reads back through what scrolled by.
+  // Taps are left alone (they still focus it); a drag is ours, so xterm's own handling doesn't scroll it twice.
+  let touchY: number | null = null;
+  let touchLines = 0;
+  host.addEventListener('touchstart', (e) => {
+    touchY = e.touches.length === 1 ? e.touches[0].clientY : null;
+    touchLines = 0;
+  }, { passive: true, capture: true });
+  host.addEventListener('touchmove', (e) => {
+    if (touchY === null || e.touches.length !== 1) return;
+    const y = e.touches[0].clientY;
+    touchLines += (touchY - y) / Math.max(1, host.clientHeight / term.rows);
+    touchY = y;
+    const whole = Math.trunc(touchLines);
+    if (whole) term.scrollLines(whole);
+    touchLines -= whole;
+    e.stopPropagation();
+    e.preventDefault();
+  }, { passive: false, capture: true });
+  host.addEventListener('touchend', () => (touchY = null), { passive: true, capture: true });
+  host.addEventListener('touchcancel', () => (touchY = null), { passive: true, capture: true });
   const sendEsc = () => {
     sendSize(true);
     sayTyping();
@@ -486,6 +508,14 @@ export function openTerminal(net: Net, workerId: string, onChanges?: () => void,
     });
     keys.append(b);
   }
+  // A page back and forth through what scrolled by, for when dragging the terminal isn't handy: first in the row, so they're in reach.
+  const pager = ([['⇞', 'Scroll up a page', -1], ['⇟', 'Scroll down a page', 1]] as const).map(([label, title, pages]) => {
+    const b = h('button.btn', { type: 'button', title, 'aria-label': title }, label);
+    b.addEventListener('pointerdown', (e) => e.preventDefault());
+    b.addEventListener('click', () => term.scrollPages(pages));
+    return b;
+  });
+  keys.prepend(...pager);
   sayForm.addEventListener('submit', (e) => {
     e.preventDefault();
     const prompt = say.value.trim();

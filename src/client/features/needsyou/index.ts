@@ -55,12 +55,17 @@ export function installNeedsYou(ctx: Ctx, parts: Pick<Parts, 'views' | 'waiting'
 
   function sync() {
     // Not ones that were asking already when the page first saw them (a reload, a floor you've just arrived on).
-    if (fresh.take(store.workers).length) {
+    const { asking, finished } = fresh.changes(store.workers);
+    if (asking.length) {
       banner.flash();
       if (settings.needsYouSound !== 'off') {
         alert(false);
         reminders.rang(performance.now());
       }
+    } else if (finished.length && settings.needsYouSound === 'knock') {
+      // A job finished: the same knock, with no flash or reminders (it's good news, and nothing's waiting on an answer).
+      sound.knock();
+      banner.knock();
     }
     for (const [id, b] of beacons) {
       if (store.workers.get(id)?.status === 'needs_input') continue;

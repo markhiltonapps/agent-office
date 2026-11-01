@@ -23,6 +23,19 @@ test('a worker that starts asking is new; one already asking when the page first
   assert.deepEqual(fresh.take(floor(worker('old', 'done'), worker('busy', 'needs_input'))), []);
 });
 
+test('a worker that finishes what it was on is told apart from one that starts asking', () => {
+  const fresh = new Fresh();
+  fresh.changes(floor(worker('a', 'working'), worker('b', 'idle'), worker('c', 'needs_input')));
+  const c = fresh.changes(floor(worker('a', 'done'), worker('b', 'done'), worker('c', 'done')));
+  // b was only waiting for a first prompt: it didn't finish anything.
+  assert.deepEqual(c.finished.map((w) => w.id), ['a', 'c']);
+  assert.deepEqual(c.asking, []);
+  // Still done: it knocked already. Back to work and done again: another job.
+  assert.deepEqual(fresh.changes(floor(worker('a', 'done'))).finished, []);
+  fresh.changes(floor(worker('a', 'working')));
+  assert.deepEqual(fresh.changes(floor(worker('a', 'done'))).finished.map((w) => w.id), ['a']);
+});
+
 test('workers on a floor you come back to are new to the page again, so arriving rings nothing', () => {
   const fresh = new Fresh();
   fresh.take(floor(worker('a', 'working')));

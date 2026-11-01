@@ -61,7 +61,7 @@ export type WorkerViewsParts = Pick<Parts, 'stage' | 'worlds' | 'travel' | 'roof
  * the queue, the theme, and what's been spent (see the order below), and the workers' own tick.
  */
 export function installWorkerViews(ctx: Ctx, core: CoreState, parts: WorkerViewsParts) {
-  const { scene, sound, player, camera, office, sky, confetti, hands, me, net } = ctx;
+  const { scene, sound, player, camera, office, sky, confetti, hands, me, net, settings } = ctx;
   const { holiday } = parts.stage;
   const { plan, groundHere, officeWing, inOffice } = parts.worlds;
 
@@ -145,7 +145,8 @@ export function installWorkerViews(ctx: Ctx, core: CoreState, parts: WorkerViews
       if (v.status !== w.status || v.acked !== w.acked) {
         // It just finished or started waiting on you (not already so when this page first saw it): ding (one that needs you has an alarm of its own, see features/needsyou), and notify if you're away.
         if (waitingOnSomeone(w) && v.status !== '' && w.status !== v.status) {
-          if (w.status === 'done') sound.ding('done');
+          // With "Knock on my screen" chosen, the knock (see features/needsyou) is the sound for a job finishing.
+          if (w.status === 'done' && settings.needsYouSound !== 'knock') sound.ding('done');
           parts.notifier.alert(w);
           // Playing at the arcade: one of yours stops the game.
           if (w.status === 'needs_input' && yours(w)) parts.cabinet.needsYou(w);
