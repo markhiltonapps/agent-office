@@ -55,6 +55,13 @@ export const accountsHandlers = {
     // Only admins may use the office's own sign-ins: a demoted one is back on their own.
     void ctx.signins.look(a.id, true);
   },
+  // Not admin only: every account may change its own password. The shared office password has no account to change.
+  'accounts.password'(ctx, c, msg) {
+    if (!c.accountId) return ctx.sendTo(c, { t: 'accounts.password', error: 'Only an account has a password of its own. Ask an admin for an invite link.' });
+    void ctx.accounts.setPassword(c.accountId, str(msg.current, 513), str(msg.next, 513)).then((error) => {
+      ctx.sendTo(c, error ? { t: 'accounts.password', error } : { t: 'accounts.password' });
+    });
+  },
   'accounts.shared'(ctx, c, msg) {
     const who = c.peer.name;
     if (!admin(ctx, c)) return;

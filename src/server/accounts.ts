@@ -153,6 +153,25 @@ export class Accounts {
     return this.data.invites.find((v) => timingSafeEqual(digest(v.token), want));
   }
 
+  /** Gives an account a new password once it has shown its current one: says what's wrong, or nothing when it's done. */
+  async setPassword(id: string, current: string, next: string): Promise<string | undefined> {
+    const a = this.get(id);
+    if (!a) return 'That account is gone';
+    if ((await this.check(a.name, current))?.id !== a.id) return "That isn't your current password";
+    if (next.length < PASSWORD_MIN) return `Pick a password of at least ${PASSWORD_MIN} characters`;
+    if (next.length > PASSWORD_MAX) return 'That password is too long';
+    const salt = randomBytes(16);
+    const derived = await hash(next, salt);
+    // Hashing took a moment: the account may have been revoked meanwhile.
+    this.sync();
+    const now = this.get(id);
+    if (!now) return 'That account is gone';
+    now.salt = salt.toString('hex');
+    now.hash = derived.toString('hex');
+    this.save();
+    return undefined;
+  }
+
   /** Uses up an invite: makes the account and returns it, or says what's wrong. */
   async join(token: string, name: string, password: string): Promise<Account | string> {
     const invite = this.findInvite(token);

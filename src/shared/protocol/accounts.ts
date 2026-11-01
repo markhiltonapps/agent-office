@@ -105,7 +105,9 @@ export type AccountsClientMsg =
   | { t: 'accounts.revoke'; accountId: string }
   | { t: 'accounts.role'; accountId: string; role: AccountRole }
   /** Let the shared office password sign people in, or stop it. */
-  | { t: 'accounts.shared'; on: boolean };
+  | { t: 'accounts.shared'; on: boolean }
+  /** Change your own account's password (answered with `accounts.password`); open to every account, not only admins. */
+  | { t: 'accounts.password'; current: string; next: string };
 
 export type SignInsClientMsg =
   /** Your own sign-ins (accounts only): look at them again. */
@@ -129,6 +131,8 @@ export type AccountsServerMsg =
   | { t: 'accounts'; state: AccountsState }
   /** Sent to whoever made the invite. */
   | { t: 'accounts.invited'; invite?: AccountInvite; error?: string }
+  /** The answer to `accounts.password`: what's wrong, or nothing when the password is changed. */
+  | { t: 'accounts.password'; error?: string }
   /** Your role changed. */
   | { t: 'me'; me: Me }
   /** Your own sign-ins, whenever they change (accounts only). */
